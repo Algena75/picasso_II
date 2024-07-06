@@ -32,4 +32,6 @@ assert any(app in INSTALLED_APPS for app in ['api.apps.ApiConfig', 'api']), (
 pytest_plugins = [
     'tests.fixtures.fixture_user',
     'tests.fixtures.fixture_data',
+    'celery.contrib.pytest',
+    'tests.fixtures.fixture_celery',
 ]
