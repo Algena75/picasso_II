@@ -7,7 +7,6 @@ from bicycles.models import Bicycle, Rent
 
 @pytest.mark.django_db(transaction=True)
 class TestRentAPI:
-    VALID_DATA = {'text': 'Поменяли текст статьи'}
 
     def test_bicycle_not_found(self, client, bicycle):
         response = client.get('/api/bicycles/')
