@@ -81,6 +81,7 @@ jobs:
       - name: Push to Docker Hub
         uses: docker/build-push-action@v4
         with:
-          context: ./docker/backend/
+          context: .
+          dockerfile: ./docker/backend/Dockerfile
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/picasso_server_ii:latest

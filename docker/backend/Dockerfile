@@ -12,10 +12,9 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 RUN apt update && pip install poetry==1.7.0 \
     && poetry config virtualenvs.create false \
     && poetry install --without test --no-interaction --no-ansi \
-    && mkdir backend docker
 
-ADD ./backend /backend/
-ADD ./docker /docker/
+ADD ./backend /app/backend
+ADD ./docker /app/docker
 
 RUN chmod +x /app/docker/backend/server-entrypoint.sh
 RUN chmod +x /app/docker/backend/worker-entrypoint.sh
