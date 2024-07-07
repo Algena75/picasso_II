@@ -11,7 +11,8 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 #RUN pip install gunicorn
 RUN apt update && pip install poetry==1.7.0 \
     && poetry config virtualenvs.create false \
-    && poetry install --without test --no-interaction --no-ansi
+    && poetry install --without test --no-interaction --no-ansi \
+    && mkdir backend docker
 
 ADD ./backend /app/backend
 ADD ./docker /app/docker
