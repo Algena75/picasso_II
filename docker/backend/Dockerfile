@@ -14,8 +14,8 @@ RUN apt update && pip install poetry==1.7.0 \
     && poetry install --without test --no-interaction --no-ansi \
     && mkdir backend docker
 
-ADD ./backend /app/backend
-ADD ./docker /app/docker
+ADD ./backend /backend/
+ADD ./docker /docker/
 
 RUN chmod +x /app/docker/backend/server-entrypoint.sh
 RUN chmod +x /app/docker/backend/worker-entrypoint.sh
