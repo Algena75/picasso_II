@@ -69,7 +69,7 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-if 'test' in sys.argv in sys.argv: # or 'test\_coverage' for django-coverage
+if 'test' in sys.argv in sys.argv:  # or 'test\_coverage' for django-coverage
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
