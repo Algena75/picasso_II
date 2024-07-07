@@ -15,20 +15,16 @@ jobs:
 
     services:
       postgres:
-        image: postgres
+        image: postgres:13.0-alpine
 
         env:
           POSTGRES_PASSWORD: postgres
           POSTGRES_USER: postgres
           POSTGRES_DB: postgres
 
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
         ports:
-          - 5432:5432
+          - ['5432:5432']
 
     steps:
     - uses: actions/checkout@v4
@@ -54,6 +50,8 @@ jobs:
         poetry install --with test
 
     - name: Test with flake8 and django tests
+      env:
+        DATABASE_URL: 'postgres://postgres:postgres@localhost:${{ job.services.postgres.ports[5432] }}/postgres'
       run: |
         poetry run flake8
         poetry run pytest
