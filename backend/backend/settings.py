@@ -1,6 +1,9 @@
 import os
 from datetime import timedelta
 from pathlib import Path
+from minio import Minio
+
+from backend.constants import constants
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -156,3 +159,10 @@ CELERY_RESULT_BACKEND = os.environ.get("RESULT_BACKEND", "redis://localhost:6379
 EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
 
 EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_emails')
+
+MINIO_CLIENT = Minio(
+    endpoint=constants.MINIO_ENDPOINT,
+    access_key=constants.MINIO_ACCESS_KEY,
+    secret_key=constants.MINIO_SECRET_KEY,
+    secure=False
+)
