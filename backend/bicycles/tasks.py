@@ -32,7 +32,9 @@ def task_execute(job_params):
     )
     try:
         with transaction.atomic():
-            transaction.on_commit(lambda: email_minio_services.delay(job_params))
+            transaction.on_commit(
+                lambda: email_minio_services.delay(job_params)
+            )
     except Exception as e:
         raise APIException(str(e))
 
@@ -54,18 +56,19 @@ def email_minio_services(job_params):
         recipient_list=[job_params.get('recipient')],
         fail_silently=False,
     )
-    rent_data = (f'Аренда: {job_params.get("id")}\n'
-                 f'Пользователь: {job_params.get("name")}\n'
-                 f'Начало аренды: {job_params.get("start")}\n'
-                 f'Завершение аренды: {job_params.get("finish")}')
+    rent_data = (f'Rent no.: {job_params.get("id")}\n'
+                 f'User: {job_params.get("name")}\n'
+                 f'Start time: {job_params.get("start")}\n'
+                 f'Finish time: {job_params.get("finish")}')
     try:
-        stream = io.BytesIO(rent_data)
+        stream = io.BytesIO(bytes(rent_data, 'utf-8'))
         if not MINIO_CLIENT.bucket_exists(constants.MINIO_BUCKET_NAME):
             MINIO_CLIENT.make_bucket(constants.MINIO_BUCKET_NAME)
-        file_name = (f'Аренда-{job_params.get("id")}-'
-                     f'{datetime.now().strftime("%d-%m-%Y")}.txt')
+        file_name = (f'Rent-{job_params.get("id")}-('
+                     f'{datetime.now().strftime("%d-%m-%Y")}).log')
         MINIO_CLIENT.put_object(bucket_name=constants.MINIO_BUCKET_NAME,
                                 object_name=file_name, data=stream,
-                                length=len(rent_data), content_type='text/plain')
-    except:
-        return logging.error('MinIO service is unavailable')
+                                length=len(rent_data),
+                                content_type='text/plain')
+    except Exception as error:
+        return logging.error(f'MinIO service is unavailable\n{error}')

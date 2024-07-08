@@ -33,6 +33,7 @@ services:
     volumes:
       - static_volume:/app/backend/django_static
       - minio_data:/app/minio_data
+      - ./backend:/app/backend
     expose:
       - 8000
     env_file:
@@ -51,7 +52,8 @@ services:
     entrypoint: /app/docker/backend/worker-entrypoint.sh
     volumes:
       - static_volume:/app/backend/django_static
-#      - minio_data:/app/minio_data
+      - minio_data:/app/minio_data
+      - ./backend:/app/backend
     environment:
       CELERY_BROKER_URL: "redis://redis:6379/0"
       CELERY_RESULT_BACKEND: "redis://redis:6379/0"

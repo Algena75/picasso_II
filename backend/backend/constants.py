@@ -19,8 +19,8 @@ class Constants:
     ADMIN_EMAIL = 'admin@admin.ru'
 
     MINIO_ENDPOINT: str = os.getenv("MINIO_ENDPOINT", 'minio:9000')
-    MINIO_ACCESS_KEY: str = os.getenv("MINIO_ACCESS_KEY")
-    MINIO_SECRET_KEY: str = os.getenv("MINIO_SECRET_KEY")
+    MINIO_ACCESS_KEY: str = os.getenv("MINIO_ROOT_USER")
+    MINIO_SECRET_KEY: str = os.getenv("MINIO_ROOT_PASSWORD")
     MINIO_BUCKET_NAME: str = os.getenv("MINIO_BUCKET_NAME", 'rent-details')
 
 
