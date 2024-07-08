@@ -1,5 +1,6 @@
 # API service
 ![test_task_workflow.yml](https://github.com/Algena75/picasso_II/actions/workflows/test_task_workflow.yml/badge.svg)
+
 Сервис аренды велосипедов (тестовое задание). 
 Реализованы эндпоинты для регистрации и аутентификации пользователей, 
 получение списка доступных велосипедов, аренды и возврата велосипедов. 
