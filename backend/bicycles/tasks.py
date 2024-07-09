@@ -7,9 +7,10 @@ from django.db import transaction
 import logging
 from rest_framework.exceptions import APIException
 
-from bicycles.models import Rent
 from backend.constants import constants
 from backend.settings import MINIO_CLIENT
+from bicycles.models import Rent
+from bicycles.spreadsheets import make_record
 
 
 @shared_task()
@@ -37,6 +38,19 @@ def task_execute(job_params):
             )
     except Exception as e:
         raise APIException(str(e))
+    try:
+        from google.oauth2.service_account import Credentials
+        from googleapiclient import discovery
+        try:
+            with transaction.atomic():
+                transaction.on_commit(
+                    lambda: make_google_record.delay(job_params)
+                )
+        except Exception as e:
+            raise APIException(str(e))
+
+    except Exception as error:
+        return logging.error(f'Google Sheets are not installed\n{error}')
 
 
 @shared_task()
@@ -72,3 +86,18 @@ def email_minio_services(job_params):
                                 content_type='text/plain')
     except Exception as error:
         return logging.error(f'MinIO service is unavailable\n{error}')
+
+
+@shared_task()
+def make_google_record(job_params):
+    list_values = [
+            job_params.get('id'),
+            job_params.get('name'),
+            job_params.get('bike'),
+            job_params.get('start').strftime("%d-%m-%Y %H:%M"),
+            job_params.get('finish').strftime("%d-%m-%Y %H:%M"),
+            job_params.get('rent_duration'),
+            constants.TAX_PER_MINUTE,
+            job_params.get('value')
+    ]
+    make_record(list_values)
