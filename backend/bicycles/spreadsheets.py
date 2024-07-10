@@ -1,47 +1,23 @@
+import logging
+
 from backend.constants import constants
-from bicycles.google_services import SHEETS_SERVICE
+from bicycles.google_services import (SHEETS_SERVICE, clear_disk,
+                                      create_spreadsheet, get_list_obj,
+                                      spreadsheet_update_values)
 
 
-def set_user_permissions(service, spreadsheetId):
-    permissions_body = {
-        'type': 'user',
-        'role': 'writer',
-        'emailAddress': constants.EMAIL_USER
-    }
-    service.permissions().create(
-        fileId=spreadsheetId,
-        body=permissions_body,
-        fields='id'
-    ).execute()
-
-
-def spreadsheet_update_values(service, spreadsheetId, data):
-    table_values = read_values(service, spreadsheetId)
-    table_values.append(data)
-
-    request_body = {
-        'majorDimension': 'ROWS',
-        'values': table_values
-    }
-    request = service.spreadsheets().values().update(
-        spreadsheetId=spreadsheetId,
-        range="A1:H100",
-        valueInputOption="USER_ENTERED",
-        body=request_body
-    )
-    request.execute()
-
-
-def read_values(service, spreadsheetId):
-    range = "A1:H100"
-    response = service.spreadsheets().values().get(
-        spreadsheetId=spreadsheetId,
-        range=range,
-        valueRenderOption='FORMULA',
-    ).execute()
-    return response['values']
-
-
-def make_record(data: list):
-    return spreadsheet_update_values(SHEETS_SERVICE, constants.SPREADSHEET_ID,
-                                     data)
+def make_record(data: list, clear: bool = False):
+    try:
+        if clear:
+            clear_disk()
+        if constants.SPREADSHEET_ID is None:
+            spreadsheet_ids = get_list_obj()
+            if spreadsheet_ids:
+                spreadsheet_id = spreadsheet_ids[0].get('id')
+            else:
+                spreadsheet_id = create_spreadsheet()
+            constants.SPREADSHEET_ID = spreadsheet_id
+        return spreadsheet_update_values(SHEETS_SERVICE, constants.SPREADSHEET_ID,
+                                         data)
+    except Exception as error:
+        return logging.error(f'Google Sheets are unavailable\n{error}')

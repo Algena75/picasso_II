@@ -39,8 +39,8 @@ def task_execute(job_params):
     except Exception as e:
         raise APIException(str(e))
     try:
-        from google.oauth2.service_account import Credentials
-        from googleapiclient import discovery
+        from google.oauth2.service_account import Credentials  # noqa
+        from googleapiclient import discovery  # noqa
         try:
             with transaction.atomic():
                 transaction.on_commit(
@@ -91,13 +91,13 @@ def email_minio_services(job_params):
 @shared_task()
 def make_google_record(job_params):
     list_values = [
-            job_params.get('id'),
-            job_params.get('name'),
-            job_params.get('bike'),
-            job_params.get('start').strftime("%d-%m-%Y %H:%M"),
-            job_params.get('finish').strftime("%d-%m-%Y %H:%M"),
-            job_params.get('rent_duration'),
-            constants.TAX_PER_MINUTE,
-            job_params.get('value')
+        job_params.get('id'),
+        job_params.get('name'),
+        job_params.get('bike'),
+        job_params.get('start').strftime("%d-%m-%Y %H:%M"),
+        job_params.get('finish').strftime("%d-%m-%Y %H:%M"),
+        job_params.get('rent_duration'),
+        constants.TAX_PER_MINUTE,
+        job_params.get('value')
     ]
     make_record(list_values)
