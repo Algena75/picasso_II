@@ -1,4 +1,5 @@
 import io
+import sys
 
 from datetime import datetime
 from celery import shared_task
@@ -10,7 +11,8 @@ from rest_framework.exceptions import APIException
 from backend.constants import constants
 from backend.settings import MINIO_CLIENT
 from bicycles.models import Rent
-from bicycles.spreadsheets import make_record
+if "pytest" not in sys.modules:
+    from bicycles.spreadsheets import make_record
 
 
 @shared_task()
@@ -48,7 +50,6 @@ def task_execute(job_params):
                 )
         except Exception as e:
             raise APIException(str(e))
-
     except Exception as error:
         return logging.error(f'Google Sheets are not installed\n{error}')
 

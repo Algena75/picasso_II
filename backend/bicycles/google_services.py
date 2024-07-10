@@ -58,7 +58,7 @@ def create_spreadsheet(service=SHEETS_SERVICE):
     response = request.execute()
     spreadsheetId = response['spreadsheetId']
     set_user_permissions(DRIVE_SERVICE, spreadsheetId)
-    logging.INFO(f'Создана таблица {spreadsheetId}')
+    logging.info(f'Создана таблица {spreadsheetId}')
     table_values = [
         ['Отчёт по аренде'],
         ['Общая выручка', '=SUM(H5:H100)'],
@@ -212,7 +212,7 @@ def spreadsheet_update_values(service, spreadsheetId, data, default=False):
         body=request_body
     )
     request.execute()
-    logging.INFO(f'Таблица {spreadsheetId} обновлена.')
+    logging.info(f'Таблица {spreadsheetId} обновлена.')
 
 
 def read_values(service, spreadsheetId):

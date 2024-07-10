@@ -24,7 +24,7 @@ class Constants:
     MINIO_BUCKET_NAME: str = os.getenv("MINIO_BUCKET_NAME", 'rent-details')
 
     EMAIL_USER = os.getenv('EMAIL')
-    INFO = {
+    INFO: dict[str, str] = {
         'type': os.getenv('TYPE'),
         'project_id': os.getenv('PROJECT_ID'),
         'private_key_id': os.getenv('PRIVATE_KEY_ID'),
