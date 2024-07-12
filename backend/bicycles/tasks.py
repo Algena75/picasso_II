@@ -16,14 +16,19 @@ if "pytest" not in sys.modules:
 
 
 @shared_task()
-def task_execute(job_params):
-    rent_value = (
+def task_execute(job_params: dict):
+    """
+    Основная задача celery - рассчёт стоимости аренды. Здесь же происходит
+    вызов функций отправки почтовых сообщений, сохранения log-файла в MinIO,
+    добавления записи в google-таблицу. Надо поработать над 'чистотой')))
+    """
+    rent_value: int = (
         int(job_params.get('rent_duration')) * constants.TAX_PER_MINUTE
     )
-    rent = Rent.objects.get(pk=job_params["rent_id"])
+    rent: Rent = Rent.objects.get(pk=job_params["rent_id"])
     rent.value = rent_value
     rent.save()
-    job_params = dict(
+    job_params: dict = dict(
         id=rent.id,
         name=rent.renter.username,
         bike=rent.bicycle.number,
@@ -55,7 +60,11 @@ def task_execute(job_params):
 
 
 @shared_task()
-def email_minio_services(job_params):
+def email_minio_services(job_params: dict):
+    """
+    Функция отправки почтового сообщения и сохранения log-файла в MinIO.
+    Есть необходимость разделения функции на 2 для чистоты.
+    """
     send_mail(
         subject=constants.EMAIL_SUBJECT.format(id=job_params.get('id')),
         message=constants.EMAIL_TEXT.format(
@@ -71,16 +80,16 @@ def email_minio_services(job_params):
         recipient_list=[job_params.get('recipient')],
         fail_silently=False,
     )
-    rent_data = (f'Rent no.: {job_params.get("id")}\n'
-                 f'User: {job_params.get("name")}\n'
-                 f'Start time: {job_params.get("start")}\n'
-                 f'Finish time: {job_params.get("finish")}')
+    rent_data: str = (f'Rent no.: {job_params.get("id")}\n'
+                      f'User: {job_params.get("name")}\n'
+                      f'Start time: {job_params.get("start")}\n'
+                      f'Finish time: {job_params.get("finish")}')
     try:
         stream = io.BytesIO(bytes(rent_data, 'utf-8'))
         if not MINIO_CLIENT.bucket_exists(constants.MINIO_BUCKET_NAME):
             MINIO_CLIENT.make_bucket(constants.MINIO_BUCKET_NAME)
-        file_name = (f'Rent-{job_params.get("id")}-('
-                     f'{datetime.now().strftime("%d-%m-%Y")}).log')
+        file_name: str = (f'Rent-{job_params.get("id")}-('
+                          f'{datetime.now().strftime("%d-%m-%Y")}).log')
         MINIO_CLIENT.put_object(bucket_name=constants.MINIO_BUCKET_NAME,
                                 object_name=file_name, data=stream,
                                 length=len(rent_data),
@@ -90,8 +99,9 @@ def email_minio_services(job_params):
 
 
 @shared_task()
-def make_google_record(job_params):
-    list_values = [
+def make_google_record(job_params: dict):
+    """Подготовка значений и вызов функции добавления записи в google sheet"""
+    list_values: list = [
         job_params.get('id'),
         job_params.get('name'),
         job_params.get('bike'),

@@ -59,142 +59,18 @@ def create_spreadsheet(service=SHEETS_SERVICE):
     spreadsheetId = response['spreadsheetId']
     set_user_permissions(DRIVE_SERVICE, spreadsheetId)
     logging.info(f'Создана таблица {spreadsheetId}')
-    table_values = [
-        ['Отчёт по аренде'],
-        ['Общая выручка', '=SUM(H5:H100)'],
-        ['Список аренд'],
-        ['ID', 'User', 'Bicycle', 'Start', 'Finish', 'Duration', 'Price',
-         'Value'],
-    ]
     spreadsheet_update_values(SHEETS_SERVICE,
                               spreadsheetId,
-                              table_values,
+                              constants.TABLE_HEADER_VALUES,
                               default=True)
     return spreadsheetId
 
 
 def spreadsheet_update_values(service, spreadsheetId, data, default=False):
     if default:
-        body = {
-            'requests': [
-                {
-                    'mergeCells': {
-                        'range': {
-                            "sheetId": 0,
-                            "startRowIndex": 0,
-                            "endRowIndex": 1,
-                            "startColumnIndex": 0,
-                            "endColumnIndex": 8
-                        },
-                        "mergeType": "MERGE_ROWS",
-                    },
-                },
-                {
-                    'mergeCells': {
-                        'range': {
-                            "sheetId": 0,
-                            "startRowIndex": 2,
-                            "endRowIndex": 3,
-                            "startColumnIndex": 0,
-                            "endColumnIndex": 8
-                        },
-                        "mergeType": "MERGE_ALL",
-                    },
-                },
-                {
-                    "repeatCell": {
-                        'range': {
-                            "sheetId": 0,
-                            "startRowIndex": 0,
-                            "endRowIndex": 1,
-                            "startColumnIndex": 0,
-                            "endColumnIndex": 8
-                        },
-                        'cell': {
-                            "userEnteredFormat": {
-                                "horizontalAlignment": "CENTER",
-                                "textFormat": {
-                                    "bold": True
-                                }
-                            }
-                        },
-                        'fields': "userEnteredFormat(textFormat,horizontalAlignment)"
-                    },
-                },
-                {
-                    "repeatCell": {
-                        'range': {
-                            "sheetId": 0,
-                            "startRowIndex": 2,
-                            "endRowIndex": 3,
-                            "startColumnIndex": 0,
-                            "endColumnIndex": 8
-                        },
-                        'cell': {
-                            "userEnteredFormat": {
-                                "horizontalAlignment": "CENTER",
-                                "textFormat": {
-                                    "bold": True
-                                }
-                            }
-                        },
-                        "fields": "userEnteredFormat(textFormat,horizontalAlignment)"
-                    },
-                },
-                {
-                    "repeatCell": {
-                        'range': {
-                            "sheetId": 0,
-                            "startRowIndex": 3,
-                            "endRowIndex": 4,
-                            "startColumnIndex": 0,
-                            "endColumnIndex": 8
-                        },
-                        'cell': {
-                            "userEnteredFormat": {
-                                "backgroundColor": {
-                                    "red": 50.0,
-                                    "green": 1.0,
-                                    "blue": 255.0
-                                },
-                                "horizontalAlignment": "CENTER",
-                                "textFormat": {
-                                    "foregroundColor": {
-                                        "blue": 1.0
-                                    },
-                                    "bold": True
-                                }
-                            }
-                        },
-                        "fields": "userEnteredFormat(backgroundColor,textFormat,horizontalAlignment)"
-                    },
-                },
-                {
-                    "repeatCell": {
-                        'range': {
-                            "sheetId": 0,
-                            "startRowIndex": 1,
-                            "endRowIndex": 2,
-                            "startColumnIndex": 1,
-                            "endColumnIndex": 2
-                        },
-                        'cell': {
-                            "userEnteredFormat": {
-                                "horizontalAlignment": "CENTER",
-                                "textFormat": {
-                                    "foregroundColor": {
-                                        "red": 1.0
-                                    },
-                                    "bold": True
-                                }
-                            }
-                        },
-                        "fields": "userEnteredFormat(textFormat,horizontalAlignment)"
-                    },
-                },
-            ],
-        }
-        request = service.spreadsheets().batchUpdate(spreadsheetId=spreadsheetId, body=body)
+        request = service.spreadsheets().batchUpdate(
+            spreadsheetId=spreadsheetId, body=constants.TABLE_HEADER_SETTINGS
+        )
         request.execute()
         table_values = data
     else:
